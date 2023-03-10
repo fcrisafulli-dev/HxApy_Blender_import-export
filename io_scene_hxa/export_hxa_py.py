@@ -163,7 +163,12 @@ def export_payload():
 
     vert_count = len(bm.verts)
     face_count = len(bm.faces)
+
+    # sometimes Blender will refuse to read data, so we ensure the lookup table
+    bm.verts.ensure_lookup_table() 
+
     verts = [[c for c in v.co] for v in bm.verts]
+    normals = [[c for c in v.normal] for v in bm.verts]
     faces = [f for f in bm.faces]
     references = [[v.index for v in f.verts] for f in faces]
     references = [
@@ -173,8 +178,11 @@ def export_payload():
 
     verts = hxa_util.flatten_list(verts)
     references = hxa_util.flatten_list(references)
+    normals = hxa_util.flatten_list(normals)
+
     log.debug(verts)
     log.debug(references)
+    log.debug(normals)
 
     bm.free()
 
@@ -355,7 +363,16 @@ def export_payload():
         "type": hxa.HXALayerDataType.HXA_LDT_FLOAT,
         "data": verts,
     }
-    vert_stack = {"layer_count": 1, "layers": [vertex_layer]}
+
+    vertex_normal_layer = {
+        "name_length": len(hxa.HXA_CONVENTION_SOFT_LAYER_NORMALS),
+        "name": hxa.HXA_CONVENTION_SOFT_LAYER_NORMALS,
+        "components": 3, # I indended to use hxa.HXA_CONVENTION_SOFT_LAYER_NORMALS_COMPONENTS but blender cant seem to find it
+        "type": hxa.HXALayerDataType.HXA_LDT_FLOAT,
+        "data": normals,
+    }
+
+    vert_stack = {"layer_count": 2, "layers": [vertex_layer,vertex_normal_layer]}
 
     reference_layer = {
         "name_length": len(hxa.HXA_CONVENTION_HARD_BASE_CORNER_LAYER_NAME),
