@@ -12,3 +12,8 @@ Features supported at the moment(what can be imported and exported alongside a m
 - Shapekeys
 - Edge creases
 - Custom properties
+
+# This is an experimental fork which has untested code
+particular features of this fork:
+- Added HXALayer for vertex normals
+- Model loading is completely untested and is likely broken
